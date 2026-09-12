@@ -243,14 +243,14 @@ export function Header({ activeNav = "home" }: { activeNav?: "home" | "events" |
 
               {/* Guidelines dropdown */}
               <div className="nav-dropdown flex items-center gap-0.5 cursor-pointer">
-                <a href="/#benefits" className={`nav-link ${activeNav === "guidelines" ? "text-primary font-bold" : ""}`}>
+                <Link to="/guidelines" className={`nav-link ${activeNav === "guidelines" ? "text-primary font-bold" : ""}`}>
                   Guidelines
-                </a>
+                </Link>
                 <ChevronDown size={14} className="text-muted-foreground mt-0.5" />
                 <div className="nav-dropdown-menu">
-                  <a href="/#benefits">Benefits</a>
-                  <a href="/#steps">Eligibility</a>
-                  <a href="/#steps">Submission Rules</a>
+                  <Link to="/guidelines">All Guidelines</Link>
+                  <a href="/guidelines#eligibility-heading">Eligibility</a>
+                  <a href="/guidelines#submission-heading">Submission Format</a>
                 </div>
               </div>
 
