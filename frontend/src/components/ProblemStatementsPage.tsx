@@ -612,8 +612,8 @@ export function ProblemStatementsPage() {
         <Header activeNav="problems" />
 
         <main className="pt-10 sm:pt-16 pb-20 sm:pb-28">
-          <div className="site-shell">
-            <h1 className="t-main-heading uppercase">Problem Statements</h1>
+          <div className="site-shell max-w-5xl">
+            <h1 className="t-main-heading uppercase text-[#172554]">Problem Statements</h1>
 
             <div className="t-section-stack mt-10 sm:mt-14 space-y-10 sm:space-y-14">
 
@@ -656,7 +656,7 @@ export function ProblemStatementsPage() {
               >
                 <h2
                   id="community-heading"
-                  className="t-subheading-2 text-[#112347] uppercase"
+                  className="t-subheading-2 text-[#172554] uppercase"
                 >
                   Theme 2: Local Community Level Innovations –{" "}
                   Village / District / State

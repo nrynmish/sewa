@@ -181,19 +181,36 @@
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #172554;
     letter-spacing: 0;
+    hyphens: none;
+    word-break: normal;
+    overflow-wrap: break-word;
+    text-wrap: balance;
   }
 
   /*
-   * Body copy is justified site-wide. Tailwind's text-* alignment utilities
-   * sit in a later cascade layer, so `text-center` / `text-right` still win
-   * wherever they are applied.
+   * Body copy: Prevent words from breaking in between with hyphens.
+   * On mobile screens (<640px), align left to eliminate rivers and unnatural word spacing.
    */
   p {
     text-align: justify;
     text-justify: inter-word;
-    hyphens: auto;
+    hyphens: none;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  @media (max-width: 640px) {
+    p {
+      text-align: left;
+      text-justify: auto;
+      hyphens: none;
+    }
   }
 
   button,
@@ -247,9 +264,9 @@
 
 @utility bg-hero-overlay {
   background: linear-gradient(to bottom,
-      oklch(0 0 0 / 0.52) 0%,
-      oklch(0 0 0 / 0.38) 60%,
-      oklch(0 0 0 / 0.60) 100%);
+      rgba(10, 20, 40, 0.65) 0%,
+      rgba(10, 20, 40, 0.45) 50%,
+      rgba(10, 20, 40, 0.75) 100%);
 }
 
 @layer components {
@@ -401,6 +418,7 @@
     line-height: 1.12;
     text-transform: uppercase;
     letter-spacing: -0.01em;
+    color: #172554;
   }
 
   .section-subtitle {
@@ -933,17 +951,21 @@
 
   .hero,
   .hero .site-shell {
-    min-height: 620px;
+    min-height: 480px;
   }
 
   .bg-hero-overlay {
-    background: linear-gradient(90deg, oklch(0.99 0 0 / 0.94), oklch(0.99 0 0 / 0.65));
+    background: linear-gradient(to bottom,
+        rgba(10, 20, 40, 0.68) 0%,
+        rgba(10, 20, 40, 0.48) 50%,
+        rgba(10, 20, 40, 0.78) 100%);
   }
 
   .countdown {
     bottom: -1rem;
     gap: 0.35rem;
     padding: 0.8rem;
+    max-width: calc(100vw - 2rem);
   }
 
   .countdown strong {
@@ -976,6 +998,34 @@
   .info-column {
     padding-bottom: 1rem;
   }
+}
+
+/* ── Mobile Navigation Drawer Animations ── */
+
+@keyframes mobile-drawer-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes mobile-drawer-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mobile-drawer-panel {
+  animation: mobile-drawer-slide-in 0.25s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.mobile-drawer-backdrop {
+  animation: mobile-drawer-backdrop-in 0.2s ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {

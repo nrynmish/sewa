@@ -110,7 +110,7 @@ const eligibilityCards = [
   },
 ];
 
-const sectionHeadingClass = "t-main-heading uppercase";
+const sectionHeadingClass = "t-main-heading uppercase text-[#172554]";
 
 function GuidelinesPage() {
   return (
@@ -173,10 +173,10 @@ function GuidelinesPage() {
             {eligibilityCards.map((card) => (
               <article
                 key={card.key}
-                className={`w-full ${card.cardBg} min-h-[112px] rounded-[16px] p-6 flex flex-row items-center gap-6`}
+                className={`w-full ${card.cardBg} min-h-[100px] sm:min-h-[112px] rounded-[16px] p-4 sm:p-6 flex flex-row items-center gap-3.5 sm:gap-6`}
               >
                 <div
-                  className={`size-[56px] ${card.badgeBg} rounded-full flex items-center justify-center shrink-0 shadow-[0px_1px_2px_rgba(0,0,0,0.05)]`}
+                  className={`size-[46px] sm:size-[56px] ${card.badgeBg} rounded-full flex items-center justify-center shrink-0 shadow-[0px_1px_2px_rgba(0,0,0,0.05)]`}
                 >
                   {card.icon}
                 </div>
@@ -198,10 +198,10 @@ function GuidelinesPage() {
           <h2 id="participate-heading" className={sectionHeadingClass}>
             How to participate
           </h2>
-          <p className="t-content w-full text-justify text-black mb-8">
+          <p className="t-content w-full text-left sm:text-justify text-black mb-6 sm:mb-8 [hyphens:none]">
             Eligible participants can take part in the SEWA First RYIC 2026 through the structured registration journey, designed to guide them from identifying a challenge to presenting their innovation.
-            <br />
-            The registration process and key steps are outlined below:
+            <br className="hidden sm:inline" />
+            {" "}The registration process and key steps are outlined below:
           </p>
 
           <ParticipationSteps />
@@ -211,7 +211,7 @@ function GuidelinesPage() {
           <h2 id="submission-heading" className={sectionHeadingClass}>
             Submission format
           </h2>
-          <p className="t-content w-full text-justify text-black mb-8">
+          <p className="t-content w-full text-left sm:text-justify text-black mb-6 sm:mb-8 [hyphens:none]">
             Participants are required to submit their innovation proposal in the prescribed 15-slide presentation format. The presentation should be concise, structured and focused on demonstrating the journey from problem identification to innovation, prototype development and potential impact. The prescribed slide format is appended for reference
           </p>
 

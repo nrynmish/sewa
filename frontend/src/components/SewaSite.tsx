@@ -19,6 +19,7 @@ import {
   Mail,
   Map,
   MapPin,
+  Menu,
   Phone,
   Play,
   Search,
@@ -112,6 +113,7 @@ export function Header({ activeNav = "home" }: { activeNav?: "home" | "events" |
   const { user, isSignedIn, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
 
   useEffect(() => {
@@ -132,6 +134,16 @@ export function Header({ activeNav = "home" }: { activeNav?: "home" | "events" |
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileMenuOpen]);
+
   // Global Ctrl+K / Cmd+K shortcut to open search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -150,19 +162,19 @@ export function Header({ activeNav = "home" }: { activeNav?: "home" | "events" |
       <div className="w-full bg-[#F3F4F6] border-b border-gray-200/50 px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between">
         <Brand />
         <div className="flex items-center gap-2.5 sm:gap-4 md:gap-5">
-          {/* dtu.ac.in link */}
+          {/* dtu.ac.in link - hidden on mobile to save space */}
           <a
             href="https://dtu.ac.in"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 text-[#ff4d4f] font-semibold text-xs sm:text-sm underline underline-offset-2 hover:opacity-80 transition-opacity"
+            className="hidden sm:flex items-center gap-1.5 text-[#ff4d4f] font-semibold text-xs sm:text-sm underline underline-offset-2 hover:opacity-80 transition-opacity"
           >
             <span>dtu.ac.in</span>
             <ExternalLink size={14} className="stroke-[2.2]" />
           </a>
 
-          {/* Social icons */}
-          <div className="flex items-center gap-2 sm:gap-2.5 text-[#ff4d4f]">
+          {/* Social icons - hidden on mobile, visible on sm+ */}
+          <div className="hidden sm:flex items-center gap-2 sm:gap-2.5 text-[#ff4d4f]">
             <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="hover:opacity-80 transition-opacity">
               <Facebook size={16} fill="currentColor" strokeWidth={0} />
             </a>
@@ -211,24 +223,34 @@ export function Header({ activeNav = "home" }: { activeNav?: "home" | "events" |
           ) : (
             <Link
               to="/signin"
-              className="inline-flex items-center justify-center rounded-full bg-[#ff4d4f] px-5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#e03d3f] transition-colors sm:px-6 sm:py-2 sm:text-sm"
+              className="hidden sm:inline-flex items-center justify-center rounded-full bg-[#ff4d4f] px-5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#e03d3f] transition-colors sm:px-6 sm:py-2 sm:text-sm"
             >
               Login
             </Link>
           )}
+
+          {/* Hamburger menu button - visible only on mobile (below lg) */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            className="lg:hidden flex items-center justify-center size-9 rounded-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200/90 shadow-2xs transition-all cursor-pointer"
+            aria-label="Open navigation menu"
+          >
+            <Menu size={18} strokeWidth={2.2} />
+          </button>
         </div>
       </div>
 
-      {/* Row 2: Sticky navigation bar that transforms on scroll with increased height */}
+      {/* Row 2: Sticky navigation bar - desktop only when not scrolled, all screens when scrolled */}
       <header
         className={`sticky top-0 z-50 bg-white border-b border-gray-200/80 transition-all duration-300 ${!isScrolled
-          ? "hidden lg:block shadow-sm py-2.5 sm:py-3"
-          : "block shadow-md py-3.5 sm:py-4 min-h-[64px] sm:min-h-[72px]"
+            ? "hidden lg:block shadow-sm py-2.5 sm:py-3"
+            : "block shadow-md py-2.5 sm:py-3.5 lg:py-4 min-h-[56px] sm:min-h-[64px] lg:min-h-[72px]"
           }`}
       >
         <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Left slot: SEWA FIRST Logo (appears on scroll like the screenshot) */}
-          <div className="flex items-center min-w-[140px] sm:min-w-[185px]">
+          <div className="flex items-center min-w-0 sm:min-w-[140px] lg:min-w-[185px]">
             <Link
               to="/"
               className={`flex items-center transition-all duration-300 ${isScrolled ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3 pointer-events-none"
@@ -238,7 +260,7 @@ export function Header({ activeNav = "home" }: { activeNav?: "home" | "events" |
               <img
                 src={sewaLogo}
                 alt="SEWA FIRST"
-                className="h-11 sm:h-13 md:h-14 w-auto object-contain shrink-0"
+                className="h-9 sm:h-11 md:h-13 lg:h-14 w-auto object-contain shrink-0"
               />
             </Link>
           </div>
@@ -318,7 +340,7 @@ export function Header({ activeNav = "home" }: { activeNav?: "home" | "events" |
           </nav>
 
           {/* Right slot: Search & Login button (appears on scroll) */}
-          <div className="flex items-center justify-end min-w-[140px] sm:min-w-[185px]">
+          <div className="flex items-center justify-end min-w-0 sm:min-w-[140px] lg:min-w-[185px]">
             <div
               className={`flex items-center gap-2 sm:gap-3 transition-all duration-300 ${isScrolled ? "opacity-100 translate-x-0" : "opacity-0 translate-x-3 pointer-events-none"
                 }`}
@@ -353,11 +375,21 @@ export function Header({ activeNav = "home" }: { activeNav?: "home" | "events" |
               ) : (
                 <Link
                   to="/signin"
-                  className="inline-flex items-center justify-center rounded-full bg-[#ff4d4f] px-4 sm:px-5 py-1.5 sm:py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#e03d3f] transition-colors sm:text-sm shrink-0"
+                  className="hidden sm:inline-flex items-center justify-center rounded-full bg-[#ff4d4f] px-4 sm:px-5 py-1.5 sm:py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#e03d3f] transition-colors sm:text-sm shrink-0"
                 >
                   Login
                 </Link>
               )}
+
+              {/* Hamburger button in sticky bar for mobile */}
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(true)}
+                className="lg:hidden flex items-center justify-center size-8 sm:size-9 rounded-full bg-gray-100/90 hover:bg-red-50 text-gray-700 border border-gray-200/80 shadow-2xs transition-all cursor-pointer shrink-0"
+                aria-label="Open navigation menu"
+              >
+                <Menu size={16} strokeWidth={2.2} />
+              </button>
             </div>
           </div>
         </div>
@@ -386,6 +418,97 @@ export function Header({ activeNav = "home" }: { activeNav?: "home" | "events" |
 
       {/* Spotlight Command Search Modal */}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      {/* ── Mobile Navigation Drawer ── */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[200] lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-xs mobile-drawer-backdrop"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          {/* Drawer panel */}
+          <nav
+            className="absolute top-0 right-0 h-full w-[280px] sm:w-[320px] bg-white shadow-2xl mobile-drawer-panel flex flex-col"
+            aria-label="Mobile navigation"
+          >
+            {/* Drawer header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <img
+                src={sewaLogo}
+                alt="SEWA FIRST"
+                className="h-9 w-auto object-contain"
+              />
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="size-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors cursor-pointer"
+                aria-label="Close menu"
+              >
+                <X size={18} strokeWidth={2.2} />
+              </button>
+            </div>
+
+            {/* Nav links */}
+            <div className="flex-1 overflow-y-auto py-3">
+              {[
+                { label: "Home", to: "/", nav: "home" },
+                { label: "About", to: "/about", nav: "about" },
+                { label: "Guidelines", to: "/guidelines", nav: "guidelines" },
+                { label: "Problem Statements", to: "/problem-statements", nav: "problems" },
+                { label: "Events", to: "/events", nav: "events" },
+                { label: "Resources", to: "/resources", nav: "resources" },
+                { label: "FAQ", to: "/faq", nav: "faq" },
+                { label: "Contact Us", to: "/contact", nav: "contact" },
+              ].map((item) => (
+                <Link
+                  key={item.nav}
+                  to={item.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-6 py-3.5 text-[15px] font-semibold uppercase tracking-wide transition-colors ${
+                    activeNav === item.nav
+                      ? "text-[#ff4d4f] bg-red-50/60 border-r-[3px] border-[#ff4d4f]"
+                      : "text-gray-800 hover:text-[#ff4d4f] hover:bg-gray-50"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Drawer footer: Auth + DTU link */}
+            <div className="border-t border-gray-100 px-5 py-4 space-y-3">
+              {isSignedIn ? (
+                <button
+                  type="button"
+                  onClick={() => { signOut(); setMobileMenuOpen(false); }}
+                  className="w-full h-10 rounded-md border border-[#ff4d4f] text-[#ff4d4f] font-semibold text-sm hover:bg-red-50 transition-colors cursor-pointer"
+                >
+                  Sign Out
+                </button>
+              ) : (
+                <Link
+                  to="/signin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center w-full h-10 rounded-md bg-[#ff4d4f] text-white font-semibold text-sm hover:bg-[#e03d3f] transition-colors"
+                >
+                  Login / Sign Up
+                </Link>
+              )}
+              <a
+                href="https://dtu.ac.in"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-1.5 text-[#ff4d4f] font-semibold text-xs underline underline-offset-2"
+              >
+                <span>dtu.ac.in</span>
+                <ExternalLink size={12} className="stroke-[2.2]" />
+              </a>
+            </div>
+          </nav>
+        </div>
+      )}
     </>
   );
 }
@@ -396,7 +519,7 @@ export function SubscribeSection() {
       <div className="site-shell">
         <div className="rounded-2xl sm:rounded-3xl bg-white border border-gray-100 shadow-[0_16px_45px_rgba(0,0,0,0.07)] px-6 py-6 sm:px-10 sm:py-7 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <h3 className="text-2xl sm:text-[28px] font-bold text-gray-900 tracking-tight uppercase">
+            <h3 className="text-2xl sm:text-[28px] font-bold text-[#172554] tracking-tight uppercase">
               Subscribe For Updates
             </h3>
             <p className="mt-1 text-xs sm:text-sm text-gray-500 font-medium">
@@ -429,18 +552,18 @@ export function SubscribeSection() {
 
 export function Footer() {
   return (
-    <footer className="footer-texture relative overflow-hidden m-0 border-none pt-20 sm:pt-24 pb-12">
-      {/* Top subtle fade gradient that blends with the white section above */}
-      <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-white via-white/70 to-transparent pointer-events-none z-[1]" />
+    <footer className="footer-texture relative overflow-hidden m-0 border-none pt-16 sm:pt-24 pb-8 sm:pb-12 bg-[#fafbfc]">
+      {/* Top subtle fade gradient that blends with the section above */}
+      <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none z-[1]" />
 
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `url(${footerImage})`,
           backgroundSize: "cover",
           backgroundPosition: "center 62%",
           backgroundRepeat: "no-repeat",
-          opacity: 0.24,
+          opacity: 0.18,
           filter: "blur(1.5px)",
           WebkitFilter: "blur(1.5px)",
           maskImage: "linear-gradient(to bottom, transparent 0%, black 18%, black 100%)",
@@ -448,126 +571,157 @@ export function Footer() {
         }}
       />
 
-      {/* Bottom subtle light grey gradient overlay */}
-      <div className="absolute bottom-0 inset-x-0 h-52 sm:h-72 bg-gradient-to-t from-gray-200/75 via-gray-100/40 to-transparent pointer-events-none z-[1]" />
+      {/* Bottom subtle light gradient overlay */}
+      <div className="absolute bottom-0 inset-x-0 h-48 sm:h-64 bg-gradient-to-t from-gray-200/70 via-gray-100/30 to-transparent pointer-events-none z-[1]" />
 
-      <div className="site-shell relative z-10 grid gap-10 md:grid-cols-12 items-start">
-        {/* Column 1: DTU – SEWA 2026, description, social icons */}
-        <div className="md:col-span-5">
-          <h2 className="mb-2.5 text-xl font-bold text-gray-900 tracking-tight">DTU – SEWA 2026</h2>
-          <p className="max-w-md text-sm leading-relaxed text-gray-800 font-medium">
-            Young India&apos;s Knowledge &amp; Technology Initiative - SEWA Youth Innovation
-            Challenge. Empowering youth to create sustainable, prototype-driven solutions for Viksit
-            Bharat.
-          </p>
+      <div className="site-shell relative z-10">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-10 items-start">
+          {/* Column 1: DTU – SEWA 2026, description, contact details & social icons */}
+          <div className="md:col-span-5 space-y-4">
+            <div className="flex items-center gap-2 select-none">
+              <img
+                src={dtuLogo}
+                alt="Delhi Technological University"
+                className="size-8 sm:size-9 object-contain"
+              />
+              <img
+                src={sewaLogo}
+                alt="SEWA"
+                className="h-7 sm:h-8 w-auto object-contain"
+              />
+            </div>
 
-          <div className="mt-6 flex items-center gap-2.5 sm:gap-3">
-            <a
-              className="size-8 rounded-full bg-white border border-gray-200/90 shadow-2xs flex items-center justify-center text-[#ff4d4f] hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all"
-              href="https://facebook.com"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Facebook"
-            >
-              <Facebook size={14} fill="currentColor" />
-            </a>
-            <a
-              className="size-8 rounded-full bg-white border border-gray-200/90 shadow-2xs flex items-center justify-center text-[#ff4d4f] hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all"
-              href="https://twitter.com"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="X"
-            >
-              <Twitter size={14} fill="currentColor" />
-            </a>
-            <a
-              className="size-8 rounded-full bg-white border border-gray-200/90 shadow-2xs flex items-center justify-center text-[#ff4d4f] hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all"
-              href="https://instagram.com"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Instagram"
-            >
-              <Instagram size={14} />
-            </a>
-          </div>
-        </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#172554] tracking-tight">
+              DTU – SEWA 2026
+            </h2>
 
-        {/* Column 2: Navigation */}
-        <div className="md:col-span-3">
-          <h3 className="mb-4 text-base font-bold text-gray-900 tracking-tight">Navigation</h3>
+            <p className="max-w-md text-sm leading-relaxed text-gray-700 font-normal">
+              Young India&apos;s Knowledge &amp; Technology Initiative - SEWA Youth Innovation
+              Challenge. Empowering youth to create sustainable, prototype-driven solutions for Viksit
+              Bharat.
+            </p>
 
-          {/*
-            Mirrors the primary navigation in <Header /> — same labels, same
-            order, same destinations. Keep the two lists in sync when either
-            navigation changes.
-          */}
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-gray-800 footer-options">
-            <Link className="footer-nav-link" to="/">
-              Home
-            </Link>
-            <Link className="footer-nav-link" to="/about">
-              About
-            </Link>
-            <Link className="footer-nav-link" to="/guidelines">
-              Guidelines
-            </Link>
-            <Link className="footer-nav-link" to="/problem-statements">
-              Problem Statements
-            </Link>
-            <Link className="footer-nav-link" to="/events">
-              Events
-            </Link>
-            <Link className="footer-nav-link" to="/resources">
-              Resources
-            </Link>
-            <Link className="footer-nav-link" to="/faq">
-              FAQ
-            </Link>
-            <Link className="footer-nav-link" to="/contact">
-              Contact Us
-            </Link>
-          </div>
-        </div>
-
-        {/* Column 3: DTU Delhi Interactive Map Card */}
-        <div className="md:col-span-4 flex justify-start md:justify-end">
-          <div className="relative w-full max-w-[340px] sm:max-w-[360px] h-[225px] sm:h-[235px] rounded-2xl overflow-hidden border border-gray-200 hover:border-[#ff4d4f] shadow-md hover:shadow-xl hover:shadow-red-500/10 bg-slate-100 group transition-all duration-300">
-            {/* DTU Delhi location hyperlink directly over map (no background card) */}
-            <a
-              href="https://www.google.com/maps/search/?api=1&query=Delhi+Technological+University"
-              target="_blank"
-              rel="noreferrer"
-              className="absolute top-3 left-3 z-10 text-left group/dtu hover:opacity-85 transition-opacity"
-              title="Open DTU location in Google Maps"
-            >
-              <div className="text-xs font-bold text-gray-900 leading-none flex items-center gap-1 drop-shadow-[0_1px_3px_rgba(255,255,255,0.95)]">
-                DTU
-                <svg width="10" height="13" viewBox="0 0 24 32" fill="none" className="inline-block text-[#ff4d4f]">
-                  <path d="M12 0C5.37258 0 0 5.37258 0 12C0 19.5 12 32 12 32C12 32 24 19.5 24 12C24 5.37258 18.6274 0 12 0Z" fill="currentColor" />
-                </svg>
+            {/* Quick Contact Info Chips on mobile & desktop */}
+            <div className="pt-1 space-y-2 text-xs sm:text-sm text-gray-600 font-medium">
+              <div className="flex items-center gap-2">
+                <MapPin size={15} className="text-[#ff4d4f] shrink-0" />
+                <span>Delhi Technological University, Bawana Road, Delhi 110042</span>
               </div>
-              <div className="text-[11px] font-bold text-gray-900 leading-tight drop-shadow-[0_1px_3px_rgba(255,255,255,0.95)]">
-                Delhi
+              <div className="flex items-center gap-2">
+                <Mail size={15} className="text-[#ff4d4f] shrink-0" />
+                <a href="mailto:sewa@dtu.ac.in" className="hover:text-[#ff4d4f] transition-colors">
+                  sewa@dtu.ac.in
+                </a>
               </div>
-            </a>
+            </div>
 
-            {/* Single Directions Button */}
-            <a
-              href="https://www.google.com/maps/dir//Delhi+Technological+University,+Bawana+Rd,+Shahbad+Daulatpur,+Village+Badli,+Rohini,+Delhi,+110042"
-              target="_blank"
-              rel="noreferrer"
-              className="absolute bottom-2.5 right-2.5 z-10 flex items-center gap-1.5 bg-[#ff4d4f] hover:bg-[#e03b40] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer group"
-              title="Get Directions on Google Maps"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-12 transition-transform">
-                <polygon points="3 11 22 2 13 21 11 13 3 11" />
-              </svg>
-              <span>Directions</span>
-            </a>
+            {/* Social Icons */}
+            <div className="pt-2 flex items-center gap-2.5 sm:gap-3">
+              <a
+                className="size-9 rounded-full bg-white border border-gray-200/90 shadow-2xs flex items-center justify-center text-[#ff4d4f] hover:bg-red-50 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                href="https://facebook.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook"
+              >
+                <Facebook size={15} fill="currentColor" />
+              </a>
+              <a
+                className="size-9 rounded-full bg-white border border-gray-200/90 shadow-2xs flex items-center justify-center text-[#ff4d4f] hover:bg-red-50 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                href="https://twitter.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="X (Twitter)"
+              >
+                <Twitter size={15} fill="currentColor" />
+              </a>
+              <a
+                className="size-9 rounded-full bg-white border border-gray-200/90 shadow-2xs flex items-center justify-center text-[#ff4d4f] hover:bg-red-50 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                href="https://instagram.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Instagram"
+              >
+                <Instagram size={15} />
+              </a>
+            </div>
+          </div>
 
-            <iframe
-              title="DTU Delhi Map"
-              srcDoc={`<!DOCTYPE html>
+          {/* Column 2: Navigation Links */}
+          <div className="md:col-span-3">
+            <h3 className="mb-3 sm:mb-4 text-base sm:text-lg font-bold text-[#172554] tracking-tight">
+              Navigation
+            </h3>
+
+            {/* Mobile-optimized touch-friendly grid */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-x-4 sm:gap-y-2.5 footer-options">
+              {[
+                { label: "Home", to: "/" },
+                { label: "About", to: "/about" },
+                { label: "Guidelines", to: "/guidelines" },
+                { label: "Problem Statements", to: "/problem-statements" },
+                { label: "Events", to: "/events" },
+                { label: "Resources", to: "/resources" },
+                { label: "FAQ", to: "/faq" },
+                { label: "Contact Us", to: "/contact" },
+              ].map((item) => (
+                <Link
+                  key={item.to}
+                  className="flex items-center gap-1.5 py-1.5 sm:py-1 px-2.5 sm:px-0 rounded-lg sm:rounded-none bg-white/60 sm:bg-transparent border border-gray-200/50 sm:border-0 footer-nav-link text-gray-800 hover:text-[#ff4d4f] text-xs sm:text-[0.78rem] font-semibold uppercase tracking-wider transition-all"
+                  to={item.to}
+                >
+                  <span className="sm:hidden text-[#ff4d4f] text-xs leading-none">•</span>
+                  <span>{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 3: DTU Delhi Interactive Map Card */}
+          <div className="md:col-span-4 flex flex-col items-start md:items-end">
+            <div className="w-full max-w-[420px] md:max-w-[360px]">
+              <h3 className="mb-3 text-base sm:text-lg font-bold text-[#172554] tracking-tight">
+                Campus Location
+              </h3>
+
+              <div className="relative w-full h-[210px] sm:h-[230px] rounded-2xl overflow-hidden border border-gray-200 hover:border-[#ff4d4f] shadow-md hover:shadow-xl hover:shadow-red-500/10 bg-slate-100 group transition-all duration-300">
+                {/* DTU Delhi location hyperlink directly over map */}
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Delhi+Technological+University"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute top-2.5 left-2.5 z-10 text-left group/dtu px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-xs border border-gray-200/80 shadow-2xs hover:bg-white transition-all"
+                  title="Open DTU location in Google Maps"
+                >
+                  <div className="text-xs font-extrabold text-[#172554] leading-none flex items-center gap-1">
+                    DTU
+                    <svg width="10" height="13" viewBox="0 0 24 32" fill="none" className="inline-block text-[#ff4d4f]">
+                      <path d="M12 0C5.37258 0 0 5.37258 0 12C0 19.5 12 32 12 32C12 32 24 19.5 24 12C24 5.37258 18.6274 0 12 0Z" fill="currentColor" />
+                    </svg>
+                  </div>
+                  <div className="text-[10px] font-bold text-gray-700 leading-tight">
+                    Delhi
+                  </div>
+                </a>
+
+                {/* Single Directions Button */}
+                <a
+                  href="https://www.google.com/maps/dir//Delhi+Technological+University,+Bawana+Rd,+Shahbad+Daulatpur,+Village+Badli,+Rohini,+Delhi,+110042"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute bottom-2.5 right-2.5 z-10 flex items-center gap-1.5 bg-[#ff4d4f] hover:bg-[#e03b40] text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer group"
+                  title="Get Directions on Google Maps"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-12 transition-transform">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                  </svg>
+                  <span>Directions</span>
+                </a>
+
+                <iframe
+                  title="DTU Delhi Map"
+                  srcDoc={`<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
@@ -604,16 +758,20 @@ export function Footer() {
   </script>
 </body>
 </html>`}
-              className="w-full h-full border-0"
-              loading="lazy"
-            />
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Bottom copyright line without top border */}
-        <p className="mt-14 sm:mt-20 text-center text-xs text-gray-700 font-medium md:col-span-12">
-          Copyright © 2026 Delhi Technological University (DTU). All Rights Reserved.
-        </p>
+        {/* Bottom copyright line with safe padding on mobile for back-to-top button */}
+        <div className="mt-10 sm:mt-16 pt-6 border-t border-gray-200/80 text-center pb-12 sm:pb-4">
+          <p className="text-xs text-gray-600 font-medium">
+            Copyright © 2026 Delhi Technological University (DTU). All Rights Reserved.
+          </p>
+        </div>
       </div>
     </footer>
   );
@@ -654,7 +812,7 @@ export function CountdownTimer() {
 
   return (
     <div
-      className="countdown px-5 sm:px-8 md:px-10 py-3 sm:py-3.5 select-none border border-black/[0.04]"
+      className="countdown px-4 sm:px-8 md:px-10 py-3 sm:py-3.5 select-none border border-black/[0.04] max-w-[calc(100vw-2rem)]"
       role="timer"
       aria-label="Countdown to SEWA 2026 Launch on 19 September 2026"
     >
@@ -1118,7 +1276,7 @@ export function StatisticsSection() {
     <section id="statistics" className="t-section-band bg-white scroll-mt-20">
       <div className="site-shell max-w-6xl">
         {/* Title */}
-        <h2 className="t-main-heading uppercase">
+        <h2 className="t-main-heading uppercase text-[#172554]">
           STATISTICS
         </h2>
 
@@ -1132,7 +1290,7 @@ export function StatisticsSection() {
                 <User size={20} strokeWidth={2.5} />
               </div>
               <div>
-                <div className="t-subheading-2 text-black">9000</div>
+                <div className="t-subheading-2 text-[#172554]">9000</div>
                 <div className="t-content font-semibold! text-gray-500 tracking-wider uppercase mt-1">
                   ENTRIES
                 </div>
@@ -1145,7 +1303,7 @@ export function StatisticsSection() {
                 <MapPin size={20} strokeWidth={2.5} />
               </div>
               <div>
-                <div className="t-subheading-2 text-black">30+</div>
+                <div className="t-subheading-2 text-[#172554]">30+</div>
                 <div className="t-content font-semibold! text-gray-500 tracking-wider uppercase mt-1">
                   SHORTLISTED
                 </div>
@@ -1158,7 +1316,7 @@ export function StatisticsSection() {
                 <Server size={20} strokeWidth={2.5} />
               </div>
               <div>
-                <div className="t-subheading-2 text-black">1 lakh +</div>
+                <div className="t-subheading-2 text-[#172554]">1 lakh +</div>
                 <div className="t-content font-semibold! text-gray-500 tracking-wider uppercase mt-1">
                   MENTORED
                 </div>
@@ -1174,7 +1332,7 @@ export function StatisticsSection() {
                 <User size={20} strokeWidth={2.5} />
               </div>
               <div>
-                <div className="t-subheading-2 text-black">9000</div>
+                <div className="t-subheading-2 text-[#172554]">9000</div>
                 <div className="t-content font-semibold! text-gray-500 tracking-wider uppercase mt-1">
                   PROTOTYPES
                 </div>
@@ -1187,7 +1345,7 @@ export function StatisticsSection() {
                 <MapPin size={20} strokeWidth={2.5} />
               </div>
               <div>
-                <div className="t-subheading-2 text-black">30+</div>
+                <div className="t-subheading-2 text-[#172554]">30+</div>
                 <div className="t-content font-semibold! text-gray-500 tracking-wider uppercase mt-1">
                   TESTED
                 </div>
@@ -1200,7 +1358,7 @@ export function StatisticsSection() {
                 <Server size={20} strokeWidth={2.5} />
               </div>
               <div>
-                <div className="t-subheading-2 text-black">1 lakh +</div>
+                <div className="t-subheading-2 text-[#172554]">1 lakh +</div>
                 <div className="t-content font-semibold! text-gray-500 tracking-wider uppercase mt-1">
                   VALIDATED
                 </div>
@@ -1214,7 +1372,7 @@ export function StatisticsSection() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6">
             {/* Card 1: Entries by Level */}
             <div className="rounded-2xl bg-white p-5 sm:p-6 border border-gray-200/90 shadow-2xs flex flex-col justify-between">
-              <h3 className="t-subheading-2 text-gray-800">
+              <h3 className="t-subheading-2 text-[#172554]">
                 Entries by Level
               </h3>
               <div className="py-4 flex flex-col items-center justify-center">
@@ -1257,7 +1415,7 @@ export function StatisticsSection() {
 
             {/* Card 2: Entries by Participant Category */}
             <div className="rounded-2xl bg-white p-5 sm:p-6 border border-gray-200/90 shadow-2xs flex flex-col justify-between">
-              <h3 className="t-subheading-2 text-gray-800">
+              <h3 className="t-subheading-2 text-[#172554]">
                 Entries by Participant Category
               </h3>
               <div className="py-4">
@@ -1295,7 +1453,7 @@ export function StatisticsSection() {
 
             {/* Card 3: Cumulative Entries */}
             <div className="rounded-2xl bg-white p-5 sm:p-6 border border-gray-200/90 shadow-2xs flex flex-col justify-between">
-              <h3 className="t-subheading-2 text-gray-800">
+              <h3 className="t-subheading-2 text-[#172554]">
                 Cumulative Entries
               </h3>
               <div className="py-4">
@@ -1454,49 +1612,49 @@ export function HomePage() {
             type="button"
             aria-label="Previous slide"
             onClick={prevSlide}
-            className="flex absolute left-3 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white hover:scale-110 active:scale-95 transition-all cursor-pointer select-none bg-white/20 hover:bg-white/40 backdrop-blur-xs p-1.5 sm:p-2 rounded-full shadow-xs"
+            className="flex absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white hover:scale-110 active:scale-95 transition-all cursor-pointer select-none bg-white/20 hover:bg-white/40 backdrop-blur-xs p-1 sm:p-2 rounded-full shadow-xs"
           >
-            <ChevronLeft size={36} strokeWidth={2.5} className="sm:size-[42px]" />
+            <ChevronLeft size={22} strokeWidth={2.5} className="sm:size-[36px]" />
           </button>
           <button
             type="button"
             aria-label="Next slide"
             onClick={nextSlide}
-            className="flex absolute right-3 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white hover:scale-110 active:scale-95 transition-all cursor-pointer select-none bg-white/20 hover:bg-white/40 backdrop-blur-xs p-1.5 sm:p-2 rounded-full shadow-xs"
+            className="flex absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 text-white/80 hover:text-white hover:scale-110 active:scale-95 transition-all cursor-pointer select-none bg-white/20 hover:bg-white/40 backdrop-blur-xs p-1 sm:p-2 rounded-full shadow-xs"
           >
-            <ChevronRight size={36} strokeWidth={2.5} className="sm:size-[42px]" />
+            <ChevronRight size={22} strokeWidth={2.5} className="sm:size-[36px]" />
           </button>
 
           {/* Hero content - centered */}
-          <div className="site-shell relative flex min-h-[580px] items-start justify-center z-10">
-            <div className="animate-rise flex flex-col items-center text-center pt-10 pb-20 max-w-3xl w-full">
+          <div className="site-shell relative flex min-h-[460px] sm:min-h-[560px] items-start justify-center z-10">
+            <div className="animate-rise flex flex-col items-center text-center pt-2 sm:pt-8 pb-20 sm:pb-24 max-w-3xl w-full px-2">
 
               {/* SEWA white logo in hero */}
-              <div className="mb-6 select-none drop-shadow-xl">
+              <div className="mb-2.5 sm:mb-5 select-none drop-shadow-md">
                 <img
                   src={sewaWhiteLogo}
                   alt="SEWA First"
-                  className="h-28 sm:h-32 md:h-36 w-auto object-contain"
+                  className="h-16 sm:h-26 md:h-34 w-auto object-contain"
                 />
               </div>
 
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-extrabold leading-tight text-white drop-shadow-lg whitespace-nowrap uppercase tracking-tight">
+              <h1 className="text-base sm:text-2xl md:text-3xl lg:text-4xl font-extrabold leading-snug !text-white uppercase tracking-tight max-w-xl">
                 Rashtriya Youth Innovation Challenge 2026
               </h1>
 
-              <p className="mt-4 text-xl sm:text-2xl md:text-3xl font-bold text-white/90 tracking-wider uppercase">
+              <p className="mt-1.5 sm:mt-2.5 text-xs sm:text-lg md:text-xl font-black !text-white/95 tracking-wider uppercase">
                 Observe. Ideate. Innovate. Impact.
               </p>
 
-              <p className="mt-5 max-w-2xl text-base sm:text-lg leading-7 font-semibold text-white/85">
-                Young India's Knowledge &amp; Technology Initiative - A 100-Day Innovation Journey empowering students, researchers, and startups to build sustainable working prototypes for Viksit Bharat.
+              <p className="mt-2.5 sm:mt-3.5 max-w-lg text-[11.5px] sm:text-sm md:text-base leading-relaxed font-normal !text-white/85 px-2">
+                Young India&apos;s Knowledge &amp; Technology Initiative — A 100-Day Innovation Journey empowering youth to build sustainable working prototypes for Viksit Bharat.
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-3 justify-center">
-                <Link to="/team-register" className="inline-flex items-center gap-2 rounded-md bg-[#e53e3e] hover:bg-[#c53030] px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 shadow-lg">
+              <div className="mt-4 sm:mt-6 flex flex-wrap gap-2.5 sm:gap-3 justify-center">
+                <Link to="/team-register" className="inline-flex items-center gap-1.5 rounded-lg bg-[#e53e3e] hover:bg-[#c53030] px-4.5 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white transition-all hover:-translate-y-0.5 shadow-md">
                   Register Your Team
                 </Link>
-                <a href="#about" className="inline-flex items-center gap-2 rounded-md bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-sm px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5">
+                <a href="#about" className="inline-flex items-center gap-1.5 rounded-lg bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-xs px-4.5 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white transition-all hover:-translate-y-0.5">
                   Latest Updates
                 </a>
               </div>
@@ -1507,18 +1665,26 @@ export function HomePage() {
         <section id="about" className="pt-36 sm:pt-[200px] pb-0">
           <div className="site-shell grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-16 items-start">
             {/* Heading */}
-            <h2 className="t-subheading-1 uppercase">
-              What
-              <br />
-              <span className="text-primary">is SEWA FIRST</span>
-              <br />
-              <span className="t-subheading-2 text-muted-foreground block mt-1 uppercase">Rashtriya Youth Innovation Challenge 2026?</span>
+            <h2 className="t-subheading-1 uppercase text-[#172554]">
+              <span className="inline lg:hidden">
+                What is <span className="!text-[#ff4d4f]">SEWA</span> FIRST
+              </span>
+              <span className="hidden lg:inline">
+                What
+                <br />
+                <span className="text-[#172554]">
+                  is <span className="!text-[#ff4d4f]">SEWA</span> FIRST
+                </span>
+              </span>
+              <span className="t-subheading-2 text-muted-foreground block mt-1 uppercase">
+                Rashtriya Youth Innovation Challenge 2026?
+              </span>
             </h2>
 
             {/* Description spans remaining 3 columns */}
             <div className="lg:col-span-3">
               <p className="t-content text-gray-700 font-medium!">
-                <strong className="font-bold text-gray-900">SEWA FIRST – Rashtriya Youth Innovation Challenge (RYIC) 2026</strong> is a national platform that empowers India's youth to identify real problems in their own surroundings and transform them into sustainable, affordable and implementable solutions. Launched at Delhi Technological University on 19 September 2026, the 100-day Challenge brings together students, researchers, educational institutions, industry, government and mentors to take innovations from problem identification and ideation to design, prototyping, validation and implementation. Rooted in the spirit of Sewa First, RYIC seeks to nurture innovation, leadership and entrepreneurship while creating solutions that deliver meaningful impact for communities and the nation.
+                <strong className="font-bold text-[#172554]">SEWA FIRST – Rashtriya Youth Innovation Challenge (RYIC) 2026</strong> is a national platform that empowers India's youth to identify real problems in their own surroundings and transform them into sustainable, affordable and implementable solutions. Launched at Delhi Technological University on 19 September 2026, the 100-day Challenge brings together students, researchers, educational institutions, industry, government and mentors to take innovations from problem identification and ideation to design, prototyping, validation and implementation. Rooted in the spirit of Sewa First, RYIC seeks to nurture innovation, leadership and entrepreneurship while creating solutions that deliver meaningful impact for communities and the nation.
               </p>
             </div>
           </div>
@@ -1539,21 +1705,21 @@ export function HomePage() {
         {/* ── Themes Section ── */}
         <section id="themes" className="t-section-band [--section-gap:140] bg-white scroll-mt-20">
           <div className="site-shell max-w-5xl">
-            <h2 className="t-main-heading">
+            <h2 className="t-main-heading text-[#172554]">
               THEMES
             </h2>
 
-            <p className="t-subheading-2 text-center text-black mb-8 sm:mb-10">
+            <p className="t-subheading-2 text-center text-[#172554] mb-8 sm:mb-10">
               The Rashtriya Youth Innovation Challenge 2026 focuses on two broad themes:
             </p>
 
-            <div className="t-content-block space-y-7 sm:space-y-8 text-black">
+            <div className="t-content-block space-y-7 sm:space-y-8 text-gray-800">
               <p id="national-themes" className="scroll-mt-28">
-                <strong className="font-bold text-black">National Level</strong> Innovations addressing critical national priorities in Defence, Space &amp; National Security, Disaster Management, AI, Robotics, Manufacturing, Energy, Environment, Infrastructure and Future Mobility
+                <strong className="font-bold text-[#172554]">National Level</strong> Innovations addressing critical national priorities in Defence, Space &amp; National Security, Disaster Management, AI, Robotics, Manufacturing, Energy, Environment, Infrastructure and Future Mobility
               </p>
 
               <p id="community-themes" className="scroll-mt-28">
-                <strong className="font-bold text-black">Local Community</strong> Level Innovations addressing grassroots challenges in Agriculture &amp; Rural Development, Education, Healthcare, Urban Problems, Environment, Sports, Employment &amp; Livelihood, Women &amp; Child Safety, Disaster Management, Transport, Energy and Tourism. The themes encourage youth to develop innovative, affordable, sustainable, scalable and implementable solutions that transform real-world problems into meaningful impact.
+                <strong className="font-bold text-[#172554]">Local Community</strong> Level Innovations addressing grassroots challenges in Agriculture &amp; Rural Development, Education, Healthcare, Urban Problems, Environment, Sports, Employment &amp; Livelihood, Women &amp; Child Safety, Disaster Management, Transport, Energy and Tourism. The themes encourage youth to develop innovative, affordable, sustainable, scalable and implementable solutions that transform real-world problems into meaningful impact.
               </p>
             </div>
           </div>
@@ -1561,13 +1727,10 @@ export function HomePage() {
 
         {/* ── Timeline of 100 Day Journey ── */}
         <section id="timeline" className="t-section-band scroll-mt-20">
-          {/* Frame width drives the roadmap's scale: the 1400px stage is
-              scaled to fit this box, so a narrower frame both shrinks the
-              diagram and widens the page margins. */}
-          <div className="mx-auto w-[min(100%-6rem,1180px)]">
-            <h2 className="t-main-heading text-center">
+          <div className="mx-auto w-[min(100%-2rem,1440px)]">
+            <h2 className="t-main-heading text-[#172554]">
               <span className="uppercase">Timeline</span>
-              <span className="t-subheading-2 block text-center text-black">OF 100 DAY SEWA FIRST RYIC 2026 JOURNEY</span>
+              <span className="t-subheading-2 block text-[#172554]">OF 100 DAY SEWA FIRST RYIC 2026 JOURNEY</span>
             </h2>
             <TimelineRoadmap />
           </div>
@@ -1753,7 +1916,17 @@ export function HomePage() {
         {/* ── Organizing Committee ── */}
         <section id="committee" className="t-section-band scroll-mt-20">
           <div className="site-shell">
-            <h2 className="t-main-heading t-title-gap-wide uppercase">
+            <h2 className="t-main-heading t-title-gap-wide text-[#172554] uppercase">
+              Organizing Committee
+            </h2>
+            <PeopleGrid rows={2} />
+          </div>
+        </section>
+
+        {/* ── Organizing Committee ── */}
+        <section id="committee" className="t-section-band scroll-mt-20">
+          <div className="site-shell">
+            <h2 className="t-main-heading t-title-gap-wide text-[#172554] uppercase">
               Organizing Committee
             </h2>
             <PeopleGrid rows={2} />
@@ -1763,7 +1936,7 @@ export function HomePage() {
         {/* ── Mentors ── */}
         <section id="mentors" className="t-section-band scroll-mt-20">
           <div className="site-shell">
-            <h2 className="t-main-heading t-title-gap-wide uppercase">
+            <h2 className="t-main-heading t-title-gap-wide uppercase text-[#172554]">
               Mentors
             </h2>
             <PeopleGrid rows={2} />
@@ -1781,19 +1954,18 @@ export function HomePage() {
  * Committee and Mentors sections so the two stay visually identical — change
  * the card here and both follow.
  *
- * Still placeholder content: swap the Array.from for the real roster when the
- * names and photos land.
+ * Sized with responsive mobile classes so avatars and labels are balanced on phones.
  */
 function PeopleGrid({ rows }: { rows: number }) {
   const COLUMNS = 4;
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 sm:gap-x-12 md:gap-x-16 gap-y-10 sm:gap-y-12 md:gap-y-16 max-w-4xl mx-auto">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 sm:gap-x-12 md:gap-x-16 gap-y-6 sm:gap-y-12 md:gap-y-16 max-w-4xl mx-auto">
       {Array.from({ length: rows * COLUMNS }).map((_, idx) => (
         <div key={idx} className="flex flex-col items-center text-center">
-          <div className="size-20 sm:size-24 md:size-28 rounded-full bg-[#d2d2d2] mb-3 sm:mb-3.5 transition-transform duration-200 hover:scale-105" />
-          <h3 className="t-subheading-2 text-gray-900">Name</h3>
-          <p className="t-content text-gray-500 mt-1">Designation</p>
+          <div className="size-16 sm:size-24 md:size-28 rounded-full bg-[#d2d2d2] mb-2 sm:mb-3.5 transition-transform duration-200 hover:scale-105" />
+          <h3 className="text-xs sm:text-base font-bold text-[#172554]">Name</h3>
+          <p className="text-[11px] sm:text-sm text-gray-500 mt-0.5">Designation</p>
         </div>
       ))}
     </div>
@@ -2480,10 +2652,8 @@ export function EventsPage() {
       <main className="t-section-stack flex-1 site-shell max-w-5xl py-12 sm:py-16">
         {/* National Launch Event */}
         <section id="launch-event" className="scroll-mt-16 text-center">
-          <h1 className="t-main-heading uppercase">
-            National
-            <br />
-            Launch Event
+          <h1 className="t-main-heading uppercase text-[#172554]">
+            National <br className="hidden sm:inline" />Launch Event
           </h1>
           <p className="t-subheading-2 mt-3 text-center text-gray-700">
             SEWA FIRST 2026 National Launch Event at Delhi Technological University
@@ -2498,10 +2668,8 @@ export function EventsPage() {
 
         {/* Competition Roadmap */}
         <section id="roadmap" className="scroll-mt-16 text-center">
-          <h2 className="t-main-heading uppercase">
-            Competition
-            <br />
-            Roadmap
+          <h2 className="t-main-heading uppercase text-[#172554]">
+            Competition <br className="hidden sm:inline" />Roadmap
           </h2>
           <p className="t-subheading-2 mt-3 text-center text-gray-700">The 100-Day Innovation Journey</p>
           <p className="t-content mx-auto mt-6 max-w-3xl text-gray-700">
@@ -2514,7 +2682,7 @@ export function EventsPage() {
 
         {/* Timeline & Stages */}
         <section id="stages" className="scroll-mt-16">
-          <h2 className="t-main-heading text-center uppercase">Timeline &amp; Stages</h2>
+          <h2 className="t-main-heading text-center uppercase text-[#172554]">Timeline &amp; Stages</h2>
           <p className="t-subheading-2 mt-3 text-center text-gray-700">
             Key phases, dates and activities for the national challenge.
           </p>
@@ -2622,7 +2790,7 @@ export function ForgotPasswordPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h2 className="text-lg font-bold text-gray-900">Password Updated</h2>
+                <h2 className="text-lg font-bold text-[#172554]">Password Updated</h2>
                 <p className="text-xs text-gray-500 leading-relaxed">
                   You can now sign in with your new password.
                 </p>
@@ -2634,7 +2802,7 @@ export function ForgotPasswordPage() {
             ) : stage === "reset" ? (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Enter Reset Code</h2>
+                  <h2 className="text-xl font-bold text-[#172554]">Enter Reset Code</h2>
                   <p className="mt-2 text-xs text-gray-500 leading-relaxed">
                     If <span className="font-semibold text-gray-700">{contact}</span> is registered,
                     a 6-digit code is on its way. Enter it below along with your new password.
@@ -2713,7 +2881,7 @@ export function ForgotPasswordPage() {
             ) : (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Forgot Password?</h2>
+                  <h2 className="text-xl font-bold text-[#172554]">Forgot Password?</h2>
                   <p className="mt-2 text-xs text-gray-500 leading-relaxed">
                     Enter your registered email address. We'll send you a 6-digit code to
                     confirm it's you before you set a new password.
@@ -2824,7 +2992,7 @@ export function ContactPage() {
         <Header activeNav="contact" />
         <main className="pt-10 sm:pt-14 pb-16 sm:pb-20">
           <div className="site-shell max-w-4xl">
-            <h1 className="t-main-heading uppercase">
+            <h1 className="t-main-heading text-[#172554] uppercase">
               CONTACT US
             </h1>
 
@@ -2835,7 +3003,7 @@ export function ContactPage() {
                 <div className="flex items-start gap-3">
                   <MapPin size={17} className="text-[#ff4d4f] shrink-0 mt-0.5" strokeWidth={1.8} />
                   <div>
-                    <h3 className="text-[18px] font-bold leading-snug text-gray-900">
+                    <h3 className="font-bold text-sm sm:text-[16px] text-[#172554] leading-snug">
                       Norther Region Coordinator
                     </h3>
                     <p className="mt-1 text-left text-[16px] leading-relaxed text-gray-500">
@@ -2848,7 +3016,7 @@ export function ContactPage() {
                 <div className="flex items-start gap-3">
                   <Mail size={17} className="text-[#ff4d4f] shrink-0 mt-0.5" strokeWidth={1.8} />
                   <div>
-                    <h3 className="text-[18px] font-bold leading-snug text-gray-900">
+                    <h3 className="font-bold text-sm sm:text-[16px] text-[#172554] leading-snug">
                       For any queries, write to:
                     </h3>
                     <a
@@ -2864,7 +3032,7 @@ export function ContactPage() {
                 <div className="flex items-start gap-3">
                   <Phone size={17} className="text-[#ff4d4f] shrink-0 mt-0.5" strokeWidth={1.8} />
                   <div>
-                    <h3 className="text-[18px] font-bold leading-snug text-gray-900">
+                    <h3 className="font-bold text-sm sm:text-[16px] text-[#172554] leading-snug">
                       Phone Lines:
                     </h3>
                     <p className="mt-0.5 text-left text-[16px] leading-relaxed text-gray-500">
@@ -2881,7 +3049,7 @@ export function ContactPage() {
                     <div className="size-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
                       <ShieldCheck size={32} />
                     </div>
-                    <h3 className="t-subheading-2 font-bold! text-gray-900">Message Received</h3>
+                    <h3 className="t-subheading-2 font-bold! text-[#172554]">Message Received</h3>
                     <p className="t-content text-gray-600 mt-2 max-w-md mx-auto">
                       Thank you for contacting SEWA 2026. An automated receipt has been registered and our team will review your query within 24–48 hours.
                     </p>
@@ -3110,7 +3278,7 @@ export function ResourcesPage() {
         <Header activeNav="resources" />
         <main className="pt-10 sm:pt-14 pb-20 sm:pb-24">
           <div className="site-shell max-w-4xl">
-            <h1 className="text-2xl sm:text-3xl md:text-[32px] font-black text-center text-gray-950 tracking-tight mb-3 uppercase">
+            <h1 className="text-2xl sm:text-3xl md:text-[32px] font-black text-center text-[#172554] tracking-tight mb-3 uppercase">
               Additional Resources
             </h1>
             <p className="t-content text-center text-gray-500 max-w-lg mx-auto mb-10 sm:mb-12">
@@ -3118,7 +3286,7 @@ export function ResourcesPage() {
             </p>
 
             <section className="mb-12">
-              <h2 className="mb-4 text-base font-bold text-gray-900 tracking-tight">
+              <h2 className="mb-4 text-base font-bold text-[#172554] tracking-tight">
                 On This Site
               </h2>
               <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
@@ -3130,7 +3298,7 @@ export function ResourcesPage() {
                   >
                     <FileText size={18} className="mt-0.5 shrink-0 text-primary" strokeWidth={1.8} />
                     <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-gray-900 leading-snug">{page.title}</h3>
+                      <h3 className="text-sm font-bold text-[#172554] leading-snug">{page.title}</h3>
                       <p className="mt-1 text-xs text-gray-500 leading-relaxed">{page.description}</p>
                     </div>
                     <ChevronRight size={16} className="ml-auto mt-0.5 shrink-0 text-gray-300" strokeWidth={1.8} />
@@ -3140,7 +3308,7 @@ export function ResourcesPage() {
             </section>
 
             <section>
-              <h2 className="mb-4 text-base font-bold text-gray-900 tracking-tight">
+              <h2 className="mb-4 text-base font-bold text-[#172554] tracking-tight">
                 External Links
               </h2>
               <div className="space-y-3">
@@ -3153,7 +3321,7 @@ export function ResourcesPage() {
                     className="flex items-start gap-3 rounded-[18px] border border-[#eaecf0] bg-[#fbfbfb] px-5 py-4 transition-all hover:border-gray-300 hover:shadow-2xs"
                   >
                     <div className="min-w-0">
-                      <h3 className="text-sm font-bold text-gray-900 leading-snug">{link.title}</h3>
+                      <h3 className="text-sm font-bold text-[#172554] leading-snug">{link.title}</h3>
                       <p className="mt-1 text-xs text-gray-500 leading-relaxed">{link.description}</p>
                     </div>
                     <ExternalLink size={16} className="ml-auto mt-0.5 shrink-0 text-gray-300" strokeWidth={1.8} />
@@ -3274,7 +3442,7 @@ export function FaqPage() {
         <Header activeNav="faq" />
         <main className="pt-10 sm:pt-14 pb-20 sm:pb-24">
           <div className="site-shell max-w-[760px]">
-            <h1 className="t-main-heading uppercase">
+            <h1 className="t-main-heading text-[#172554] uppercase">
               Frequently Asked Questions
             </h1>
             <p className="t-content text-center text-gray-500 max-w-lg mx-auto mb-10 sm:mb-12">
@@ -3291,7 +3459,7 @@ export function FaqPage() {
                     className="rounded-[18px] bg-[#fbfbfb] border border-[#eaecf0] px-6 sm:px-7 py-4 sm:py-4.5 transition-all cursor-pointer hover:border-gray-300 hover:shadow-2xs select-none"
                   >
                     <div className="flex items-center justify-between gap-4">
-                      <h3 className="t-content font-bold! text-[#0e1726]">
+                      <h3 className="t-content font-bold! text-[#172554]">
                         {item.q}
                       </h3>
                       <ChevronDown
@@ -3335,7 +3503,7 @@ export function AboutPage() {
             <section aria-labelledby="vision-heading">
               <h1
                 id="vision-heading"
-                className="t-main-heading uppercase"
+                className="t-main-heading text-[#172554] uppercase"
               >
                 VISION
               </h1>
@@ -3348,7 +3516,7 @@ export function AboutPage() {
             <section aria-labelledby="mission-heading">
               <h2
                 id="mission-heading"
-                className="t-main-heading uppercase"
+                className="t-main-heading text-[#172554] uppercase"
               >
                 MISSION
               </h2>
@@ -3361,7 +3529,7 @@ export function AboutPage() {
             <section aria-labelledby="philosophy-heading">
               <h2
                 id="philosophy-heading"
-                className="t-main-heading uppercase"
+                className="t-main-heading text-[#172554] uppercase"
               >
                 PHILOSOPHY
               </h2>
@@ -3384,7 +3552,7 @@ export function AboutPage() {
             <section aria-labelledby="aim-heading">
               <h2
                 id="aim-heading"
-                className="t-main-heading uppercase"
+                className="t-main-heading text-[#172554] uppercase"
               >
                 AIM
               </h2>
@@ -3402,7 +3570,7 @@ export function AboutPage() {
             <section aria-labelledby="objectives-heading">
               <h2
                 id="objectives-heading"
-                className="t-main-heading uppercase"
+                className="t-main-heading text-[#172554] uppercase"
               >
                 OBJECTIVES
               </h2>
@@ -3418,7 +3586,7 @@ export function AboutPage() {
             <section aria-labelledby="unique-features-heading">
               <h2
                 id="unique-features-heading"
-                className="t-main-heading uppercase"
+                className="t-main-heading text-[#172554] uppercase"
               >
                 UNIQUE FEATURES
               </h2>
@@ -3430,28 +3598,55 @@ export function AboutPage() {
                   The Challenge further emphasizes affordability, sustainability, field validation, user feedback and scalability, ensuring that successful innovations are not limited to prototypes but have a clear pathway towards adoption, replication and deployment for the intended beneficiaries.
                 </p>
               </div>
-              <div className="mt-10 sm:mt-14 flex flex-col items-center">
+              <div className="relative left-1/2 mt-10 w-[min(100vw-2rem,1140px)] -translate-x-1/2 sm:mt-14 flex flex-col items-center">
                 <img
                   src={uniqueFeaturesSvg}
                   alt="Unique Features - Complete Innovation Pathway"
-                  className="w-full max-w-3xl h-auto object-contain select-none"
+                  className="w-full max-w-[1100px] h-auto object-contain select-none"
                 />
-                <p className="text-center text-gray-800 font-medium text-base sm:text-lg mt-6">
+                <p className="text-center text-[#172554] font-semibold text-lg sm:text-xl md:text-2xl mt-6 sm:mt-8 tracking-tight">
                   Every solution must demonstrate a complete pathway
                 </p>
               </div>
             </section>
 
             {/* 7. PURPOSE & BENEFITS */}
-            <section aria-labelledby="purpose-benefits-heading" className="min-h-[200px] sm:min-h-[280px]">
+            <section aria-labelledby="purpose-benefits-heading">
               <h2
                 id="purpose-benefits-heading"
-                className="t-main-heading uppercase"
+                className="t-main-heading text-[#172554] uppercase"
               >
                 PURPOSE &amp; BENEFITS
               </h2>
-              {/* Space reserved for content */}
-              <div className="py-8 sm:py-14" />
+              <div className="t-content-block space-y-6 sm:space-y-7 text-gray-800">
+                <p className="font-normal text-gray-800">
+                  The Sewa First Innovation Challenge empowers youth to identify real local and national problems and create innovative, practical and scalable solutions that contribute to nation-building and Viksit Bharat.
+                </p>
+
+                <div className="space-y-4">
+                  <p className="font-semibold text-gray-900">
+                    Participants will:
+                  </p>
+                  <ul className="space-y-3 sm:space-y-3.5 pl-1 sm:pl-2">
+                    {[
+                      "Develop innovation & problem-solving skills",
+                      "Apply knowledge to real-world challenges",
+                      "Build teamwork, leadership & entrepreneurial skills",
+                      "Gain exposure to mentors, experts & industry",
+                      "Showcase ideas and gain recognition & incubation opportunities",
+                      "Outstanding innovations will be recognised and awarded.",
+                    ].map((benefit, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <span
+                          className="mt-2.5 h-1.5 w-1.5 rounded-full bg-[#172554] shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span className="text-gray-800">{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </section>
           </div>
         </main>

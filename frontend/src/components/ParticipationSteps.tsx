@@ -236,60 +236,108 @@ export function ParticipationSteps() {
   }, []);
 
   return (
-    <div
-      ref={frameRef}
-      className="w-full overflow-hidden"
-      style={{ aspectRatio: `${STAGE_WIDTH} / ${STAGE_HEIGHT}` }}
-      role="img"
-      aria-label="How to participate: check eligibility, select innovation track, select theme, select problem statement, form your team, submit innovation proposal"
-    >
-      <div
-        className="relative select-none"
-        style={{
-          width: STAGE_WIDTH,
-          height: STAGE_HEIGHT,
-          transformOrigin: "top left",
-          transform: `scale(${scale})`,
-        }}
-      >
-        {/* Continuous bar: six equal colour segments */}
-        <div
-          className="absolute left-0 w-full flex z-0 rounded-full overflow-hidden shadow-sm"
-          style={{ top: BAR_TOP, height: BAR_H }}
-        >
+    <div className="w-full">
+      {/* Mobile-Friendly Vertical Stepper (< 768px) */}
+      <div className="block md:hidden py-2 px-1">
+        <div className="relative border-l-2 border-slate-200 ml-3.5 space-y-4 pl-4 sm:pl-5">
           {steps.map((step) => (
-            <div
-              key={step.number}
-              className="h-full"
-              style={{ width: `${100 / COLUMNS}%`, backgroundColor: step.color }}
-            />
+            <div key={step.number} className="relative">
+              {/* Node circle on the vertical spine */}
+              <div
+                className="absolute -left-[27px] top-1 size-6 rounded-full flex items-center justify-center shadow-xs ring-3 ring-white"
+                style={{ backgroundColor: step.color }}
+              >
+                <span className="text-white text-[9px] font-black leading-none">
+                  {step.number}
+                </span>
+              </div>
+
+              {/* Step Card */}
+              <div className="rounded-xl bg-[#fbfbfc] border border-slate-200/80 p-3.5 shadow-2xs">
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <div
+                    className="size-8 rounded-lg flex items-center justify-center shrink-0 p-1.5 shadow-2xs"
+                    style={{
+                      backgroundColor: `${step.color}15`,
+                      border: `1.5px solid ${step.color}`,
+                      color: step.color,
+                    }}
+                  >
+                    {step.icon}
+                  </div>
+                  <h3
+                    className="text-xs sm:text-sm font-bold uppercase tracking-tight min-w-0 flex-1 [hyphens:none]"
+                    style={{ color: step.color }}
+                  >
+                    {step.title}
+                  </h3>
+                </div>
+
+                <p className="text-[11.5px] sm:text-xs text-slate-600 leading-relaxed font-normal [hyphens:none]">
+                  {step.body}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
+      </div>
 
-        {/* Number pills, centred on the bar */}
-        {steps.map((step, i) => (
+      {/* Desktop / Tablet Scaled Graphic (>= 768px) */}
+      <div
+        ref={frameRef}
+        className="hidden md:block w-full overflow-hidden"
+        style={{ aspectRatio: `${STAGE_WIDTH} / ${STAGE_HEIGHT}` }}
+        role="img"
+        aria-label="How to participate: check eligibility, select innovation track, select theme, select problem statement, form your team, submit innovation proposal"
+      >
+        <div
+          className="relative select-none"
+          style={{
+            width: STAGE_WIDTH,
+            height: STAGE_HEIGHT,
+            transformOrigin: "top left",
+            transform: `scale(${scale})`,
+          }}
+        >
+          {/* Continuous bar: six equal colour segments */}
           <div
-            key={`node-${step.number}`}
-            className="absolute -translate-x-1/2 z-30 rounded-full text-white flex items-center justify-center font-extrabold shadow-md"
-            style={{
-              left: nodeLeft(i),
-              top: BAR_TOP + BAR_H / 2 - NODE / 2,
-              width: NODE,
-              height: NODE,
-              backgroundColor: step.color,
-              border: "5px solid #ffffff",
-              fontSize: 20,
-              lineHeight: 1,
-            }}
+            className="absolute left-0 w-full flex z-0 rounded-full overflow-hidden shadow-sm"
+            style={{ top: BAR_TOP, height: BAR_H }}
           >
-            {step.number}
+            {steps.map((step) => (
+              <div
+                key={step.number}
+                className="h-full"
+                style={{ width: `${100 / COLUMNS}%`, backgroundColor: step.color }}
+              />
+            ))}
           </div>
-        ))}
 
-        {/* Connector, icon and text, alternating sides */}
-        {steps.map((step, i) => (
-          <StepColumn key={`col-${step.number}`} step={step} index={i} />
-        ))}
+          {/* Number pills, centred on the bar */}
+          {steps.map((step, i) => (
+            <div
+              key={`node-${step.number}`}
+              className="absolute -translate-x-1/2 z-30 rounded-full text-white flex items-center justify-center font-extrabold shadow-md"
+              style={{
+                left: nodeLeft(i),
+                top: BAR_TOP + BAR_H / 2 - NODE / 2,
+                width: NODE,
+                height: NODE,
+                backgroundColor: step.color,
+                border: "5px solid #ffffff",
+                fontSize: 20,
+                lineHeight: 1,
+              }}
+            >
+              {step.number}
+            </div>
+          ))}
+
+          {/* Connector, icon and text, alternating sides */}
+          {steps.map((step, i) => (
+            <StepColumn key={`col-${step.number}`} step={step} index={i} />
+          ))}
+        </div>
       </div>
     </div>
   );

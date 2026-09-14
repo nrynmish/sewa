@@ -104,7 +104,7 @@ const steps: Step[] = [
   {
     number: "01",
     title: "Ideate",
-    dates: "Days 1–15 • 15 Sep – 1 Oct 2026",
+    dates: "Days 1–15 • 19 Sep – 1 Oct 2026",
     body: "Launch of 50 National Problem Statements, online orientation, team registrations, and idea submissions.",
     color: "#F25C22",
     side: "below",
@@ -248,21 +248,66 @@ export function TimelineRoadmap() {
   }, []);
 
   return (
-    <div
-      ref={frameRef}
-      className="w-full overflow-hidden"
-      style={{ aspectRatio: `${STAGE_WIDTH} / ${STAGE_HEIGHT}` }}
-      role="img"
-      aria-label="Timeline of the 100 day journey: Ideate, Screen, Build, Validate, Test, Select"
-    >
+    <div className="w-full">
+      {/* Mobile-Friendly Vertical Stepper Timeline (screens < 768px) */}
+      <div className="block md:hidden py-2 px-1">
+        <div className="relative border-l-2 border-slate-200 ml-3.5 space-y-4 pl-4 sm:pl-5">
+          {steps.map((step) => {
+            const dateParts = step.dates.split("•");
+            const dayRange = dateParts[0]?.trim();
+            const dateSpan = dateParts[1]?.trim();
+
+            return (
+              <div key={step.number} className="relative">
+                {/* Node circle on the vertical spine */}
+                <div
+                  className="absolute -left-[27px] top-1 size-6 rounded-full flex items-center justify-center shadow-xs ring-3 ring-white"
+                  style={{ backgroundColor: step.color }}
+                >
+                  <span className="text-white text-[9px] font-black leading-none">
+                    {step.number}
+                  </span>
+                </div>
+
+                {/* Step Card */}
+                <div className="rounded-xl bg-[#fbfbfc] border border-slate-200/80 p-3 sm:p-3.5 shadow-2xs">
+                  <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+                    <span
+                      className="text-xs sm:text-sm font-bold uppercase tracking-tight [hyphens:none]"
+                      style={{ color: step.color }}
+                    >
+                      {step.title}
+                    </span>
+                    {dayRange && (
+                      <span className="text-[9.5px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md whitespace-nowrap">
+                        {dayRange}
+                      </span>
+                    )}
+                  </div>
+
+                  {dateSpan && (
+                    <div className="text-[10.5px] font-medium text-slate-600 mb-1.5 [hyphens:none]">
+                      {dateSpan}
+                    </div>
+                  )}
+
+                  <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-normal [hyphens:none]">
+                    {step.body}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Desktop / Tablet Scaled Graphic (screens >= 768px) */}
       <div
-        className="relative select-none"
-        style={{
-          width: STAGE_WIDTH,
-          height: STAGE_HEIGHT,
-          transformOrigin: "top left",
-          transform: `scale(${scale})`,
-        }}
+        ref={frameRef}
+        className="hidden md:block w-full overflow-hidden"
+        style={{ aspectRatio: `${STAGE_WIDTH} / ${STAGE_HEIGHT}` }}
+        role="img"
+        aria-label="Timeline of the 100 day journey: Ideate, Screen, Build, Validate, Test, Select"
       >
         {/* Continuous segmented bar */}
         <div className="absolute left-0 w-full flex z-10" style={{ top: BAR_TOP, height: BAR_H }}>
